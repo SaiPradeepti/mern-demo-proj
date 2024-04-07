@@ -36,7 +36,37 @@ const register = async (req, res) => {
     }
 }
 
-module.exports = { home, register }
+// user login logic
+
+const login = async (req,res) => {
+    try {
+            const {email, password} = req.body
+            const userExits = await User.findOne({email})
+
+            if(!userExits){
+                return res.status(400).json({message: "Invalid Credentials"})
+            }
+
+            const user = await bcrypt.compare(password, userExits.password)
+
+            if(user){
+                res.status(200).json({
+                    msg: "login sucessful",
+                    token: await userExits.generateToken(),
+                    userId: userExits._id.toString()
+                })
+            }else{
+                res.status(401).json({
+                    message: `internal server error ${error}`
+                })
+            }
+
+    } catch (error) {
+        res.status(500).json(`internal server error: ${error}`)
+    }
+}
+
+module.exports = { home, register, login }
 
 // _id needs to be converted to string as _id holds an ObjectId 
 // The field name _id is reserved for use as a primary key
