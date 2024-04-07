@@ -30,10 +30,13 @@ const register = async (req, res) => {
         const userCreated = await User.create({username, email, phone, password})
 
         // console.log(data)
-        res.status(200).json({message: userCreated})
+        res.status(201).json({msg: "registration successful", token: await userCreated.generateToken(), userId: userCreated._id.toString()})
     } catch (error) {
         res.status(500).json(`internal server error: ${error}`)
     }
 }
 
 module.exports = { home, register }
+
+// _id needs to be converted to string as _id holds an ObjectId 
+// The field name _id is reserved for use as a primary key
